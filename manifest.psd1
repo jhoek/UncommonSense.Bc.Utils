@@ -9,7 +9,7 @@
 @{
 
     # Script module or binary module file associated with this manifest.
-    RootModule        = 'UncommonSense.Bc.Utils.psm1'
+    RootModule        = 'UncommonSense.Bc.Utils.dll'
 
     # Version number of this module.
     ModuleVersion     = '0.0.1'
