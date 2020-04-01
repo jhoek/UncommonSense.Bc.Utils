@@ -1,8 +1,0 @@
-/Users/jhoek/GitHub/UncommonSense.Bc.Utils/output/UncommonSense.Bc.Utils/UncommonSense.Bc.Utils.deps.json
-/Users/jhoek/GitHub/UncommonSense.Bc.Utils/output/UncommonSense.Bc.Utils/UncommonSense.Bc.Utils.dll
-/Users/jhoek/GitHub/UncommonSense.Bc.Utils/output/UncommonSense.Bc.Utils/UncommonSense.Bc.Utils.pdb
-/Users/jhoek/GitHub/UncommonSense.Bc.Utils/obj/Debug/UncommonSense.Bc.Utils.csprojAssemblyReference.cache
-/Users/jhoek/GitHub/UncommonSense.Bc.Utils/obj/Debug/UncommonSense.Bc.Utils.AssemblyInfoInputs.cache
-/Users/jhoek/GitHub/UncommonSense.Bc.Utils/obj/Debug/UncommonSense.Bc.Utils.AssemblyInfo.cs
-/Users/jhoek/GitHub/UncommonSense.Bc.Utils/obj/Debug/UncommonSense.Bc.Utils.dll
-/Users/jhoek/GitHub/UncommonSense.Bc.Utils/obj/Debug/UncommonSense.Bc.Utils.pdb
