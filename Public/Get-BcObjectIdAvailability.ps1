@@ -13,8 +13,32 @@ function Get-BcObjectIdAvailability
         [ValidateNotNull()]
         [scriptblock]$InUse = { param([string]$Path, [switch]$Recurse) Get-BcObjectInfo -Path $Path -Recurse:$Recurse },
 
+        [switch]$Summary,
+
         [switch]$Recurse
     )
 
-    [ObjectIdInfo[]]$InUseResult = & $InUse -Path $Path -Recurse:$Recurse
+    [UncommonSense.Bc.Utils.ObjectIdRange[]]$IdRangeResult = & $IdRange -Path $Path
+    [UncommonSense.Bc.Utils.ObjectIdInfo[]]$InUseResult = & $InUse -Path $Path -Recurse:$Recurse
+
+    if ($Summary)
+    {
+        
+    }
+    else
+    {
+        $IdRangeResult `
+        | ForEach-Object {
+            $CurrentRange = $_
+
+            ($CurrentRange.From)..($CurrentRange.To) `
+            | ForEach-Object {
+                [UncommonSense.Bc.Utils.ObjectIdAvailability]::new(
+                    $CurrentRange.Type,
+                    $_,
+                    [UncommonSense.Bc.Utils.Availability]::InUse
+                )            
+            }
+    }
+}
 }

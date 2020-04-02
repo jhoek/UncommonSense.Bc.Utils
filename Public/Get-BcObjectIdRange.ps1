@@ -2,8 +2,9 @@ function Get-BcObjectIdRange
 {
     param
     (
-        [Parameter(Mandatory, Position = 0)]
-        [string]$Path    
+        [Parameter(Position = 0)]
+        [ValidateNotNullOrEmpty()]
+        [string]$Path = '.'
     )
 
     $AppJsonPath = Join-Path -Path $Path -ChildPath 'app.json'
@@ -18,6 +19,15 @@ function Get-BcObjectIdRange
     | ConvertFrom-Json -Depth 10 `
     | Select-Object -ExpandProperty idRanges `
     | ForEach-Object {
-        
-    }
+        $CurrentRange = $_
+
+        [Enum]::GetValues([UncommonSense.Bc.Utils.ObjectType]) `
+        | ForEach-Object {
+            [UncommonSense.Bc.Utils.ObjectIdRange]::new(
+                $_,
+                $CurrentRange.From,
+                $CurrentRange.To
+            )
+        }
+}
 }
