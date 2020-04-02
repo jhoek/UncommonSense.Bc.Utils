@@ -18,6 +18,13 @@ namespace UncommonSense.Bc.Utils
         EnumExtension
     }
 
+    public enum Availability
+    {
+        Available,
+        Reserved,
+        InUse
+    }
+
     public class ObjectIdInfo
     {
         public ObjectIdInfo(ObjectType type, int id)
@@ -40,5 +47,29 @@ namespace UncommonSense.Bc.Utils
 
         public string Name { get; }
         public string BaseName { get; }
+    }
+
+    public class ObjectIdAvailability : ObjectIdInfo
+    {
+        public ObjectIdAvailability(ObjectType type, int id, Availability availability) : base(type, id)
+        {
+            Availability = availability;
+        }
+
+        public Availability Availability { get; }
+    }
+
+    public class ObjectIdRange
+    {
+        public ObjectIdRange(ObjectType type, int from, int to)
+        {
+            Type = type;
+            From = from;
+            To = to;
+        }
+
+        public ObjectType Type { get; }
+        public int From { get; }
+        public int To { get; }
     }
 }

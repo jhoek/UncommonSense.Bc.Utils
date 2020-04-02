@@ -16,5 +16,8 @@ function Get-BcObjectIdRange
 
     Get-Content -Path $AppJsonPath `
     | ConvertFrom-Json -Depth 10 `
-    | Select-Object -ExpandProperty idRanges        
+    | Select-Object -ExpandProperty idRanges `
+    | ForEach-Object {
+        
+    }
 }
