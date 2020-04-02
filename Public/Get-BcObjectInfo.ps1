@@ -1,5 +1,8 @@
+using namespace UncommonSense.Bc.Utils
+
 function Get-BcObjectInfo 
 {
+    [OutputType([ObjectIdInfo])]
     param
     (
         [Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName, Position = 0)]
@@ -19,15 +22,12 @@ function Get-BcObjectInfo
             Get-Content -Path $CurrentFullName -TotalCount 1 `
             | Select-String '^(?<Type>[A-Za-z]+)\s+(?<ID>\d+)\s+(?<Name>.*?)(\s+extends\s+(?<BaseName>.*))?$' `
             | ForEach-Object {
-                [pscustomobject]@{
-                    Path       = $CurrentFullName
-                    FileName   = $CurrentFileName
-                    Type       = $_.Matches[0].Groups['Type']
-                    ID         = $_.Matches[0].Groups['ID']
-                    Name       = $_.Matches[0].Groups['Name']                    
-                    BaseName   = $_.Matches[0].Groups['BaseName']
-                    PSTypeName = 'UncommonSense.Bc.Utils.ObjectInfo'
-                }
+                [ObjectInfo]::new(
+                    $_.Matches[0].Groups['Type'].Value,
+                    $_.Matches[0].Groups['ID'].Value,
+                    $_.Matches[0].Groups['Name'].Value,                    
+                    $_.Matches[0].Groups['BaseName'].Value
+                )
             }
     }
 }
