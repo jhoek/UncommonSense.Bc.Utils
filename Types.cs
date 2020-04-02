@@ -20,7 +20,7 @@ namespace UncommonSense.Bc.Utils
 
     public class ObjectIdInfo
     {
-        internal ObjectIdInfo(ObjectType type, int id)
+        public ObjectIdInfo(ObjectType type, int id)
         {
             Type = type;
             ID = id;
@@ -28,5 +28,17 @@ namespace UncommonSense.Bc.Utils
 
         public ObjectType Type { get; }
         public int ID { get; }
+    }
+
+    public class ObjectInfo : ObjectIdInfo
+    {
+        public ObjectInfo(ObjectType type, int id, string name, string baseName) : base(type, id)
+        {
+            Name = name;
+            BaseName = baseName;
+        }
+
+        public string Name { get; }
+        public string BaseName { get; }
     }
 }
