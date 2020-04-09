@@ -20,6 +20,7 @@ namespace UncommonSense.Bc.Utils
 
     public enum Availability
     {
+        Unavailable, // i.e., not inside your ID range
         Available,
         Reserved,
         InUse
