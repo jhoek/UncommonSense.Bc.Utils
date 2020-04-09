@@ -1,0 +1,1 @@
+Get-BcObjectInfo -Path $PSScriptRoot/demo
