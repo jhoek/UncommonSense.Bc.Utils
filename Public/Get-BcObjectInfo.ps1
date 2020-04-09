@@ -1,4 +1,4 @@
-function Get-BcObjectInfo 
+function Get-BcObjectInfo
 {
     [OutputType([UncommonSense.Bc.Utils.ObjectIdInfo])]
     param
@@ -20,10 +20,10 @@ function Get-BcObjectInfo
                 [UncommonSense.Bc.Utils.ObjectInfo]::new(
                     $_.Matches[0].Groups['Type'].Value,
                     $_.Matches[0].Groups['ID'].Value,
-                    $_.Matches[0].Groups['Name'].Value,                    
+                    $_.Matches[0].Groups['Name'].Value,
                     $_.Matches[0].Groups['BaseName'].Value
                 )
             }
-    }
+    } | Sort-Object Type, ID
 }
 }
