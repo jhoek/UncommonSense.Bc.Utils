@@ -2,7 +2,6 @@ namespace UncommonSense.Bc.Utils
 {
     public enum ObjectType
     {
-        Unknown,
         Table,
         TableExtension,
         Page,

@@ -32,8 +32,7 @@ namespace UncommonSense.Bc.Utils.Cmdlets
         protected IEnumerable<ObjectType> EffectiveObjectTypes =>
             ParameterSetName == ParameterSet.SelectedObjectTypes ?
                 ObjectType :
-                ((ObjectType[])Enum.GetValues(typeof(ObjectType)))
-                    .Where(t => t != UncommonSense.Bc.Utils.ObjectType.Unknown);
+                ((ObjectType[])Enum.GetValues(typeof(ObjectType)));
 
         protected override void EndProcessing() =>
             WriteObject(EffectiveObjectTypes.Select(t => new ObjectIdRange(t, FromObjectID, ToObjectID)), true);
