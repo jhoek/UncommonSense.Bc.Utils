@@ -1,6 +1,8 @@
+using System.Management.Automation;
+
 namespace UncommonSense.Bc.Utils
 {
-    public class ObjectIdAvailabilitySummary
+    public class ObjectIdAvailabilitySummary : PSObject
     {
         internal ObjectIdAvailabilitySummary(int id)
         {
@@ -8,9 +10,15 @@ namespace UncommonSense.Bc.Utils
         }
 
         public int ID { get; }
-        public Availability Table { get; set; }
-        public Availability Page { get; set; }
 
-        // FIXME: Rest
+        public void SetAvailability(ObjectType objectType, Availability availability)
+        {
+            var propertyName = objectType.ToString();
+
+            if (Properties[propertyName] != null)
+                Properties.Remove(propertyName);
+
+            Properties.Add(new PSNoteProperty(propertyName, availability));
+        }
     }
 }
