@@ -11,7 +11,7 @@ namespace UncommonSense.Bc.Utils
     [OutputType(typeof(ObjectInfo))]
     public class GetBcObjectInfoCmdlet : PSCmdlet
     {
-        public static readonly Regex pattern = new Regex(@"^(?<Type>[A-Za-z]+)\s+(?<ID>\d+)\s+(?<Name>.*?)(\s+extends\s+(?<BaseName>.*))?$");
+        public static readonly Regex pattern = new Regex(@"^(?<ObjectType>[A-Za-z]+)\s+(?<ObjectID>\d+)\s+(?<ObjectName>.*?)(\s+extends\s+(?<BaseName>.*))?$");
 
         [Parameter(Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -20,14 +20,16 @@ namespace UncommonSense.Bc.Utils
         [Parameter()]
         public SwitchParameter Recurse { get; set; }
 
+        // FIXME: Object Type Filtering
+
         protected override void ProcessRecord() =>
             WriteObject(ObjectInfos, true);
 
         protected IEnumerable<ObjectInfo> ObjectInfos =>
             Matches.Select(m => new ObjectInfo(
-                (ObjectType)Enum.Parse(typeof(ObjectType), m.Groups["Type"].Value, true),
-                int.Parse(m.Groups["ID"].Value),
-                m.Groups["Name"].Value,
+                (ObjectType)Enum.Parse(typeof(ObjectType), m.Groups["ObjectType"].Value, true),
+                int.Parse(m.Groups["ObjectID"].Value ?? "0"),
+                m.Groups["ObjectName"].Value,
                 m.Groups["BaseName"].Value
             ));
 
@@ -53,27 +55,3 @@ namespace UncommonSense.Bc.Utils
             Recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
     }
 }
-
-/*
-        
-
-        public static IEnumerable<ObjectIdInfo> Create(string signature)
-        {
-            switch (pattern.Match(signature))
-            {
-                case Match m when m.Success:
-                    yield return new ObjectIdInfo()
-                    {
-                        TypeText = ,
-                        Type = ParseObjectType(m.Groups["Type"].Value),
-                        ID = ,
-                    };
-
-                    break;
-
-                default:
-                    yield break;
-            }
-        }
-
-*/
