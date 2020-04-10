@@ -6,15 +6,15 @@ namespace UncommonSense.Bc.Utils
 {
     public class ObjectIdInfo
     {
-        internal ObjectIdInfo(ObjectType type, int id)
+        internal ObjectIdInfo(ObjectType objectType, int objectID)
         {
-            Type = type;
-            ID = id;
+            ObjectType = objectType;
+            ObjectID = objectID;
         }
 
-        public override string ToString() => $"{Type} {ID}";
+        public override string ToString() => $"{ObjectType} {ObjectID}";
 
-        public ObjectType Type { get; }
-        public int ID { get; }
+        public ObjectType ObjectType { get; }
+        public int ObjectID { get; }
     }
 }

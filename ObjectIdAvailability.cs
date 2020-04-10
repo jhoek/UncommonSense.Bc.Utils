@@ -2,15 +2,15 @@ namespace UncommonSense.Bc.Utils
 {
     public class ObjectIdAvailability
     {
-        internal ObjectIdAvailability(ObjectType type, int id, Availability status)
+        internal ObjectIdAvailability(ObjectType objectType, int objectID, Availability availability)
         {
-            Type = type;
-            ID = id;
-            Status = status;
+            ObjectType = objectType;
+            ObjectID = objectID;
+            Availability = availability;
         }
 
-        public ObjectType Type { get; }
-        public int ID { get; }
-        public Availability Status { get; }
+        public ObjectType ObjectType { get; }
+        public int ObjectID { get; }
+        public Availability Availability { get; }
     }
 }
