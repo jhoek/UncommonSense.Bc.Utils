@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace UncommonSense.Bc.Utils
 {
@@ -14,5 +16,7 @@ namespace UncommonSense.Bc.Utils
         public ObjectType ObjectType { get; }
         public int FromObjectID { get; }
         public int ToObjectID { get; }
+        public int Count => ToObjectID - FromObjectID + 1;
+        public IEnumerable<int> IDs => Enumerable.Range(FromObjectID, Count);
     }
 }
