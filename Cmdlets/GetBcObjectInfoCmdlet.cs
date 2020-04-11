@@ -18,13 +18,20 @@ namespace UncommonSense.Bc.Utils
         public string Path { get; set; } = ".";
 
         [Parameter()]
+        [ValidateNotNull()]
+        public ObjectType[] ObjectType {get;set;} = Helper.AllObjectTypes().ToArray();
+
+        [Parameter()]
         public SwitchParameter Recurse { get; set; }
 
-        // FIXME: Object Type Filtering
         // FIXME: Page customizations
 
         protected override void ProcessRecord() =>
-            WriteObject(ObjectInfos, true);
+            WriteObject(
+                ObjectInfos
+                    .Where(o => ObjectType.Contains(o.ObjectType)),
+                true
+            );
 
         protected IEnumerable<ObjectInfo> ObjectInfos =>
             Matches.Select(m => new ObjectInfo(
