@@ -16,7 +16,7 @@ namespace UncommonSense.Bc.Utils
 
         [Parameter()]
         [ValidateCount(1, int.MaxValue)]
-        public ObjectType[] ObjectType { get; set; } = (ObjectType[])(Enum.GetValues(typeof(ObjectType)));
+        public ObjectType[] ObjectType { get; set; } = Helper.AllObjectTypes().ToArray();
 
         protected override void EndProcessing()
         {
