@@ -17,7 +17,8 @@
                 "isDefault": true
             },
             "presentation": {
-                "reveal": "silent"
+                "reveal": "always",
+                "panel": "dedicated"
             },
             "problemMatcher": "$msCompile"
         }
