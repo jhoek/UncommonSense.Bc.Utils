@@ -70,7 +70,7 @@ namespace UncommonSense.Bc.Utils
             idRanges.ForEach(r => { if (!result.AddIdRange(r)) { WriteWarning("The ID ranges specified appear to overlap."); } });
             reserved.ForEach(i => { if (!result.AddReservedObject(i)) { WriteWarning($"Reservation for {i.ObjectType} {i.ObjectID} lies outside of the available ID ranges."); } });
             inUse.ForEach(i => { if (!result.AddUsedObject(i)) { WriteWarning($"Used {i.ObjectType} {i.ObjectID} lies outside of the available ID ranges."); } });
-            WriteObject(result, true);
+            WriteObject(result, false);
         }
 
         protected void WriteDetails(IEnumerable<ObjectIdRange> idRanges, IEnumerable<ObjectIdInfo> reserved, IEnumerable<ObjectIdInfo> inUse)
