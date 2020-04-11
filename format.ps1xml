@@ -123,5 +123,20 @@
 				</TableRowEntries>
 			</TableControl>
 		</View>
+		<View>
+			<Name>Default</Name>
+			<ViewSelectedBy>
+				<TypeName>UncommonSense.Bc.Utils.ObjectIdAvailabilitySummaries</TypeName>
+			</ViewSelectedBy>
+			<CustomControl>
+				<CustomEntries>
+					<CustomEntry>
+						<CustomItem>
+							<Text>Oink</Text>
+						</CustomItem>
+					</CustomEntry>
+				</CustomEntries>
+			</CustomControl>
+		</View>
 	</ViewDefinitions>
 </Configuration>

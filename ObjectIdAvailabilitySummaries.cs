@@ -12,7 +12,7 @@ namespace UncommonSense.Bc.Utils
 
         public ObjectType[] ObjectTypes { get; }
 
-        protected override int GetKeyForItem(ObjectIdAvailabilitySummary item) => item.ID;
+        protected override int GetKeyForItem(ObjectIdAvailabilitySummary item) => item.ObjectID;
 
         public bool AddIdRange(ObjectIdRange objectIdRange)
         {

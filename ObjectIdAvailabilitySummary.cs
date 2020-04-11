@@ -3,15 +3,16 @@ using System.Management.Automation;
 
 namespace UncommonSense.Bc.Utils
 {
-    public class ObjectIdAvailabilitySummary : PSObject
+    public class ObjectIdAvailabilitySummary : PSObject // FIXME: Doesn't seem to add much; consider Object as base type
     {
-        internal ObjectIdAvailabilitySummary(ObjectType type, int id, ObjectType[] relevantObjectTypes)
+        internal ObjectIdAvailabilitySummary(ObjectType objectType, int objectID, ObjectType[] relevantObjectTypes)
         {
-            Properties.Add(new PSNoteProperty("ID", id));
-            relevantObjectTypes.ForEach(t => SetAvailability(t, t == type ? Availability.Available : Availability.NotInRange));
+            Properties.Add(new PSNoteProperty(nameof(ObjectID), objectID));
+            TypeNames.Insert(0, "UncommonSense.Bc.Utils.ObjectIdAvailabilitySummary");
+            relevantObjectTypes.ForEach(t => SetAvailability(t, t == objectType ? Availability.Available : Availability.NotInRange));
         }
 
-        public int ID => (int)Properties["ID"].Value;
+        public int ObjectID => (int)(Properties[nameof(ObjectID)]?.Value ?? 0);
 
         public Availability? GetAvailability(ObjectType objectType) =>
             Properties.Any(p => p.Name == objectType.ToString()) ?
@@ -25,6 +26,5 @@ namespace UncommonSense.Bc.Utils
             else
                 Properties.Add(new PSNoteProperty(objectType.ToString(), availability));
         }
-
     }
 }
