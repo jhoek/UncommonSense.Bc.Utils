@@ -32,10 +32,23 @@ namespace UncommonSense.Bc.Utils
             using (var document = JsonDocument.Parse(File.ReadAllText(appJsonPath)))
             {
                 if (document.RootElement.TryGetProperty("idRanges", out var idRanges))
-                    idRanges.Select(r => new ObjectIdRange(r.GetProperty("from"), r.))
+                    idRanges
+                        .EnumerateArray()
+                        .ForEach(r =>
+                            ObjectType
+                                .ForEach(t =>
+                                    WriteObject(
+                                        new ObjectIdRange(
+                                            t,
+                                            r.GetProperty("from").GetInt32(),
+                                            r.GetProperty("to").GetInt32()
+                                        )
+                                    )
+                                )
+                        );
+                else
+                    WriteWarning($"Cannot retrieve object ID ranges; app.json file in {path} does not contain appropriate elements.");
             }
         }
     }
-
-    // FIXME: Object Type Filtering
 }
