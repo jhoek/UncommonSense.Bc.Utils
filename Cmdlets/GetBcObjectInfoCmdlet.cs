@@ -21,6 +21,7 @@ namespace UncommonSense.Bc.Utils
         public SwitchParameter Recurse { get; set; }
 
         // FIXME: Object Type Filtering
+        // FIXME: Page customizations
 
         protected override void ProcessRecord() =>
             WriteObject(ObjectInfos, true);
