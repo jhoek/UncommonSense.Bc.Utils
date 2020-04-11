@@ -23,9 +23,12 @@ namespace UncommonSense.Bc.Utils
         [Parameter()]
         public SwitchParameter Recurse { get; set; }
 
+        // FIXME: FOrmatting for summary (colors)
+        // FIXME: Consider making parameters their native type, and provide argument transofmrations for scriptblocks
+
         [Parameter()]
         [ValidateNotNull()]
-        public ScriptBlock IdRange { get; set; } = ScriptBlock.Create("param([string]$Path) Get-BcObjectIdRange -Path $Path");
+        public ScriptBlock IdRange { get; set; } = ScriptBlock.Create("param([string]$Path) Get-BcObjectIdRange -Path $Path"); // FIXME: Consider passing Objecttype parmaeter
 
         [Parameter()]
         [ValidateNotNull()]
@@ -33,7 +36,7 @@ namespace UncommonSense.Bc.Utils
 
         [Parameter()]
         [ValidateNotNull()]
-        public ScriptBlock InUse { get; set; } = ScriptBlock.Create("param([string]$Path, [switch]$Recurse) Get-BcObjectInfo -Path $Path -Recurse:$Recurse");
+        public ScriptBlock InUse { get; set; } = ScriptBlock.Create("param([string]$Path, [switch]$Recurse) Get-BcObjectInfo -Path $Path -Recurse:$Recurse"); // FIXME: Consider passing Objecttype parmaeter
 
         [Parameter()]
         public ObjectType[] ObjectType { get; set; }
@@ -56,18 +59,17 @@ namespace UncommonSense.Bc.Utils
 
             switch (Summary.IsPresent)
             {
-                case true: WriteSummary(idRanges); break;
+                case true: WriteSummary(idRanges, reserved, inUse); break;
                 case false: WriteDetails(idRanges, reserved, inUse); break;
             }
         }
 
-        protected void WriteSummary(IEnumerable<ObjectIdRange> idRanges)
+        protected void WriteSummary(IEnumerable<ObjectIdRange> idRanges, IEnumerable<ObjectIdInfo> reserved, IEnumerable<ObjectIdInfo> inUse)
         {
-            var result = new List<ObjectIdAvailabilitySummary>();
-
-
-
-
+            var result = new ObjectIdAvailabilitySummaries(ObjectType ?? Helper.AllObjectTypes().ToArray());
+            idRanges.ForEach(r => { if (!result.AddIdRange(r)) { WriteWarning("The ID ranges specified appear to overlap."); } });
+            reserved.ForEach(i => { if (!result.AddReservedObject(i)) { WriteWarning($"Reservation for {i.ObjectType} {i.ObjectID} lies outside of the available ID ranges."); } });
+            inUse.ForEach(i => { if (!result.AddUsedObject(i)) { WriteWarning($"Used {i.ObjectType} {i.ObjectID} lies outside of the available ID ranges."); } });
             WriteObject(result, true);
         }
 
@@ -75,9 +77,7 @@ namespace UncommonSense.Bc.Utils
         {
             WriteObject(
                 idRanges.SelectMany(r =>
-                    Enumerable
-                        .Range(r.FromObjectID, r.ToObjectID - r.FromObjectID + 1)
-                        .Select(i => new ObjectIdAvailability(r.ObjectType, i, CalculateAvailability(r.ObjectType, i, reserved, inUse)))
+                    r.IDs.Select(i => new ObjectIdAvailability(r.ObjectType, i, CalculateAvailability(r.ObjectType, i, reserved, inUse)))
                 ),
                 true
             );

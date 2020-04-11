@@ -1,24 +1,30 @@
+using System.Linq;
 using System.Management.Automation;
 
 namespace UncommonSense.Bc.Utils
 {
     public class ObjectIdAvailabilitySummary : PSObject
     {
-        internal ObjectIdAvailabilitySummary(int id)
+        internal ObjectIdAvailabilitySummary(ObjectType type, int id, ObjectType[] relevantObjectTypes)
         {
-            ID = id;
+            Properties.Add(new PSNoteProperty("ID", id));
+            relevantObjectTypes.ForEach(t => SetAvailability(t, t == type ? Availability.Available : Availability.NotInRange));
         }
 
-        public int ID { get; }
+        public int ID => (int)Properties["ID"].Value;
+
+        public Availability? GetAvailability(ObjectType objectType) =>
+            Properties.Any(p => p.Name == objectType.ToString()) ?
+                (Availability)Properties[objectType.ToString()].Value :
+                default(Availability?);
 
         public void SetAvailability(ObjectType objectType, Availability availability)
         {
-            var propertyName = objectType.ToString();
-
-            if (Properties[propertyName] != null)
-                Properties.Remove(propertyName);
-
-            Properties.Add(new PSNoteProperty(propertyName, availability));
+            if (GetAvailability(objectType).HasValue)
+                Properties[objectType.ToString()].Value = availability;
+            else
+                Properties.Add(new PSNoteProperty(objectType.ToString(), availability));
         }
+
     }
 }

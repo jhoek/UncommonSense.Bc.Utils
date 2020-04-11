@@ -41,5 +41,87 @@
 				</TableRowEntries>
 			</TableControl>
 		</View>
+		<View>
+			<Name>Default</Name>
+			<ViewSelectedBy>
+				<TypeName>UncommonSense.Bc.Utils.ObjectIdRange</TypeName>
+			</ViewSelectedBy>
+			<TableControl>
+				<TableHeaders>
+					<TableColumnHeader>
+						<Width>20</Width>
+					</TableColumnHeader>
+					<TableColumnHeader>
+						<Alignment>Right</Alignment>
+						<Width>10</Width>
+					</TableColumnHeader>
+					<TableColumnHeader>
+						<Alignment>Right</Alignment>
+						<Width>10</Width>
+					</TableColumnHeader>
+				</TableHeaders>
+				<TableRowEntries>
+					<TableRowEntry>
+						<TableColumnItems>
+							<TableColumnItem>
+								<PropertyName>ObjectType</PropertyName>
+							</TableColumnItem>
+							<TableColumnItem>
+								<PropertyName>FromObjectID</PropertyName>
+							</TableColumnItem>
+							<TableColumnItem>
+								<PropertyName>ToObjectID</PropertyName>
+							</TableColumnItem>
+						</TableColumnItems>
+					</TableRowEntry>
+				</TableRowEntries>
+			</TableControl>
+		</View>
+		<View>
+			<Name>Default</Name>
+			<ViewSelectedBy>
+				<TypeName>UncommonSense.Bc.Utils.ObjectIdAvailability</TypeName>
+			</ViewSelectedBy>
+			<TableControl>
+				<TableHeaders>
+					<TableColumnHeader>
+						<Width>10</Width>
+					</TableColumnHeader>
+					<TableColumnHeader>
+						<Width>10</Width>
+						<Alignment>Right</Alignment>
+					</TableColumnHeader>
+					<TableColumnHeader>
+						<Label>Availability</Label>
+						<Width>12</Width>
+					</TableColumnHeader>
+				</TableHeaders>
+				<TableRowEntries>
+					<TableRowEntry>
+						<TableColumnItems>
+							<TableColumnItem>
+								<PropertyName>ObjectType</PropertyName>
+							</TableColumnItem>
+							<TableColumnItem>
+								<PropertyName>ObjectID</PropertyName>
+							</TableColumnItem>
+							<TableColumnItem>
+								<ScriptBlock>
+									$CurrentItem = $_
+
+									switch($true)
+									{
+										(-not $Host.UI.SupportsVirtualTerminal) { $CurrentItem.Availability }
+										($CurrentItem.Availability -eq 'Available') { "`e[32m$($CurrentItem.Availability)`e[0m" }
+										($CurrentItem.Availability -eq 'Reserved') { "`e[34m$($CurrentItem.Availability)`e[0m" }
+										($CurrentItem.Availability -eq 'InUse') { "`e[31m$($CurrentItem.Availability)`e[0m" }
+									}
+								</ScriptBlock>
+							</TableColumnItem>
+						</TableColumnItems>
+					</TableRowEntry>
+				</TableRowEntries>
+			</TableControl>
+		</View>
 	</ViewDefinitions>
 </Configuration>
