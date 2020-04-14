@@ -1,5 +1,26 @@
 <Configuration>
+	<DefaultSettings>
+		<ShowError/>
+		<DisplayError/>
+	</DefaultSettings>
 	<ViewDefinitions>
+		<View>
+			<Name>Default</Name>
+			<ViewSelectedBy>
+				<TypeName>UncommonSense.Bc.Utils.ObjectIdAvailabilitySummary</TypeName>
+			</ViewSelectedBy>
+			<CustomControl>
+				<CustomEntries>
+					<CustomEntry>
+						<CustomItem>
+							<ExpressionBinding>
+								<ScriptBlock>[string[]]$Properties = @('ObjectID') + ($_.ConsideredObjectTypes); Write-host $Properties.GetType().FullName;($_.Items) | Format-Table -Property $Properties | Out-String</ScriptBlock>
+							</ExpressionBinding>
+						</CustomItem>
+					</CustomEntry>
+				</CustomEntries>
+			</CustomControl>
+		</View>
 		<View>
 			<Name>Table</Name>
 			<ViewSelectedBy>
@@ -8,17 +29,17 @@
 			<TableControl>
 				<TableHeaders>
 					<TableColumnHeader>
-						<Width>16</Width>
+						<Width>10</Width>
 					</TableColumnHeader>
 					<TableColumnHeader>
 						<Width>10</Width>
 						<Alignment>Right</Alignment>
 					</TableColumnHeader>
 					<TableColumnHeader>
-						<Width>30</Width>
+						<Width>40</Width>
 					</TableColumnHeader>
 					<TableColumnHeader>
-						<Width>30</Width>
+						<Width>40</Width>
 					</TableColumnHeader>
 				</TableHeaders>
 				<TableRowEntries>
@@ -106,37 +127,12 @@
 								<PropertyName>ObjectID</PropertyName>
 							</TableColumnItem>
 							<TableColumnItem>
-								<ScriptBlock>
-									$CurrentItem = $_
-
-									switch($true)
-									{
-										(-not $Host.UI.SupportsVirtualTerminal) { $CurrentItem.Availability }
-										($CurrentItem.Availability -eq 'Available') { "`e[32m$($CurrentItem.Availability)`e[0m" }
-										($CurrentItem.Availability -eq 'Reserved') { "`e[34m$($CurrentItem.Availability)`e[0m" }
-										($CurrentItem.Availability -eq 'InUse') { "`e[31m$($CurrentItem.Availability)`e[0m" }
-									}
-								</ScriptBlock>
+								<ScriptBlock>$CurrentItem = $_; switch($true) {	(-not $Host.UI.SupportsVirtualTerminal) { $CurrentItem.Availability }; ($CurrentItem.Availability -eq 'Available') { "`e[32m$($CurrentItem.Availability)`e[0m" }; ($CurrentItem.Availability -eq 'Reserved') { "`e[34m$($CurrentItem.Availability)`e[0m" }; ($CurrentItem.Availability -eq 'InUse') { "`e[31m$($CurrentItem.Availability)`e[0m" } }	</ScriptBlock>
 							</TableColumnItem>
 						</TableColumnItems>
 					</TableRowEntry>
 				</TableRowEntries>
 			</TableControl>
-		</View>
-		<View>
-			<Name>Default</Name>
-			<ViewSelectedBy>
-				<TypeName>UncommonSense.Bc.Utils.ObjectIdAvailabilitySummaries</TypeName>
-			</ViewSelectedBy>
-			<CustomControl>
-				<CustomEntries>
-					<CustomEntry>
-						<CustomItem>
-							<Text>Oink</Text>
-						</CustomItem>
-					</CustomEntry>
-				</CustomEntries>
-			</CustomControl>
 		</View>
 	</ViewDefinitions>
 </Configuration>

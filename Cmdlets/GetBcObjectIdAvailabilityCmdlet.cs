@@ -7,7 +7,7 @@ namespace UncommonSense.Bc.Utils
 {
     [Cmdlet(VerbsCommon.Get, "BcObjectIdAvailability", DefaultParameterSetName = ParameterSet.Details)]
     [OutputType(typeof(Availability), ParameterSetName = new string[] { ParameterSet.Details })]
-    [OutputType(typeof(ObjectIdAvailabilitySummary), ParameterSetName = new string[] { ParameterSet.Summary })]
+    [OutputType(typeof(ObjectIdAvailabilitySummaryItem), ParameterSetName = new string[] { ParameterSet.Summary })]
     public class GetBcObjectIdAvailabilityCmdlet : PSCmdlet
     {
         public static class ParameterSet
@@ -66,11 +66,11 @@ namespace UncommonSense.Bc.Utils
 
         protected void WriteSummary(IEnumerable<ObjectIdRange> idRanges, IEnumerable<ObjectIdInfo> reserved, IEnumerable<ObjectIdInfo> inUse)
         {
-            var result = new ObjectIdAvailabilitySummaries(ObjectType ?? Helper.AllObjectTypes().ToArray());
-            idRanges.ForEach(r => { if (!result.AddIdRange(r)) { WriteWarning("The ID ranges specified appear to overlap."); } });
-            reserved.ForEach(i => { if (!result.AddReservedObject(i)) { WriteWarning($"Reservation for {i.ObjectType} {i.ObjectID} lies outside of the available ID ranges."); } });
-            inUse.ForEach(i => { if (!result.AddUsedObject(i)) { WriteWarning($"Used {i.ObjectType} {i.ObjectID} lies outside of the available ID ranges."); } });
-            WriteObject(result, false);
+            var result = new ObjectIdAvailabilitySummary(ObjectType);
+            idRanges.ForEach(r => { if (!result.AddIdRange(r)) WriteWarning("The ID ranges specified appear to overlap."); });
+            reserved.ForEach(i => { if (!result.AddReservedObject(i)) WriteWarning($"Reservation for {i.ObjectType} {i.ObjectID} lies outside of the available ID ranges."); });
+            inUse.ForEach(i => { if (!result.AddUsedObject(i)) WriteWarning($"Used {i.ObjectType} {i.ObjectID} lies outside of the available ID ranges."); });
+            WriteObject(result);
         }
 
         protected void WriteDetails(IEnumerable<ObjectIdRange> idRanges, IEnumerable<ObjectIdInfo> reserved, IEnumerable<ObjectIdInfo> inUse)

@@ -1,30 +1,80 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Management.Automation;
 
 namespace UncommonSense.Bc.Utils
 {
-    public class ObjectIdAvailabilitySummary : PSObject // FIXME: Doesn't seem to add much; consider Object as base type
+    public class ObjectIdAvailabilitySummary
     {
-        internal ObjectIdAvailabilitySummary(ObjectType objectType, int objectID, ObjectType[] relevantObjectTypes)
+        private Dictionary<int, ObjectIdAvailabilitySummaryItem> innerDictionary = new Dictionary<int, ObjectIdAvailabilitySummaryItem>();
+
+        public ObjectIdAvailabilitySummary(ObjectType[] consideredObjectTypes)
         {
-            Properties.Add(new PSNoteProperty(nameof(ObjectID), objectID));
-            TypeNames.Insert(0, "UncommonSense.Bc.Utils.ObjectIdAvailabilitySummary");
-            relevantObjectTypes.ForEach(t => SetAvailability(t, t == objectType ? Availability.Available : Availability.NotInRange));
+            ConsideredObjectTypes = consideredObjectTypes ?? Helper.AllObjectTypes().ToArray();
         }
 
-        public int ObjectID => (int)(Properties[nameof(ObjectID)]?.Value ?? 0);
+        public ObjectType[] ConsideredObjectTypes { get; }
 
-        public Availability? GetAvailability(ObjectType objectType) =>
-            Properties.Any(p => p.Name == objectType.ToString()) ?
-                (Availability)Properties[objectType.ToString()].Value :
-                default(Availability?);
+        public IEnumerable<ObjectIdAvailabilitySummaryItem> Items => innerDictionary.Values;
 
-        public void SetAvailability(ObjectType objectType, Availability availability)
+        public bool AddIdRange(ObjectIdRange objectIdRange)
         {
-            if (GetAvailability(objectType).HasValue)
-                Properties[objectType.ToString()].Value = availability;
+            var result = true; // Assume no overlapping ranges
+
+            // Test for relevant object types
+            if (!ConsideredObjectTypes.Contains(objectIdRange.ObjectType))
+                return result;
+
+            foreach (var objectID in objectIdRange.IDs)
+            {
+                if (!innerDictionary.ContainsKey(objectID))
+                {
+                    innerDictionary.Add(objectID, new ObjectIdAvailabilitySummaryItem(objectID).SetAvailability(objectIdRange.ObjectType, Availability.Available));
+                }
+                else
+                {
+                    if (innerDictionary[objectID].GetAvailability(objectIdRange.ObjectType) == Availability.Available)
+                        result = false;
+                    else
+                        innerDictionary[objectID].SetAvailability(objectIdRange.ObjectType, Availability.Available);
+                }
+            }
+
+            return result;
+        }
+
+        public bool AddReservedObject(ObjectIdInfo objectIdInfo)
+        {
+            if (!ConsideredObjectTypes.Contains(objectIdInfo.ObjectType))
+                return true;
+
+            if (innerDictionary.ContainsKey(objectIdInfo.ObjectID))
+            {
+                innerDictionary[objectIdInfo.ObjectID].SetAvailability(objectIdInfo.ObjectType, Availability.Reserved);
+                return true;
+            }
             else
-                Properties.Add(new PSNoteProperty(objectType.ToString(), availability));
+            {
+                return false;
+            }
+        }
+
+        public bool AddUsedObject(ObjectIdInfo objectIdInfo)
+        {
+            // Returns false if the object's ID is outside of the ranges in the collection
+
+            if (!ConsideredObjectTypes.Contains(objectIdInfo.ObjectType))
+                return true;
+
+            if (innerDictionary.ContainsKey(objectIdInfo.ObjectID))
+            {
+                innerDictionary[objectIdInfo.ObjectID].SetAvailability(objectIdInfo.ObjectType, Availability.InUse);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }
