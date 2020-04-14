@@ -1,4 +1,4 @@
-tableextension 50100 MyExtension extends MyTargetTable
+tableextension 50100 MyTableExtension extends MyTable
 {
     fields
     {

@@ -1,4 +1,4 @@
-pageextension 50100 MyExtension extends MyTargetPage
+pageextension 50100 MyExtension extends MyPage
 {
     layout
     {

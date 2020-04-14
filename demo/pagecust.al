@@ -1,4 +1,4 @@
-pagecustomization MyCustomization customizes MyTargetPage
+pagecustomization MyCustomization customizes MyPage
 {
     layout
     {
