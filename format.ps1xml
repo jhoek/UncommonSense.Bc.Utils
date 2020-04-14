@@ -14,7 +14,7 @@
 					<CustomEntry>
 						<CustomItem>
 							<ExpressionBinding>
-								<ScriptBlock>[string[]]$Properties = @('ObjectID') + ($_.ConsideredObjectTypes); Write-host $Properties.GetType().FullName;($_.Items) | Format-Table -Property $Properties | Out-String</ScriptBlock>
+								<ScriptBlock>[string[]]$Properties = @('ObjectID') + ($_.ConsideredObjectTypes); | Format-Table -Property $Properties | Out-String</ScriptBlock>
 							</ExpressionBinding>
 						</CustomItem>
 					</CustomEntry>
