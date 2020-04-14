@@ -23,12 +23,11 @@ namespace UncommonSense.Bc.Utils
         [Parameter()]
         public SwitchParameter Recurse { get; set; }
 
-        // FIXME: FOrmatting for summary (colors)
         // FIXME: Consider making parameters their native type, and provide argument transofmrations for scriptblocks
 
         [Parameter()]
         [ValidateNotNull()]
-        public ScriptBlock IdRange { get; set; } = ScriptBlock.Create("param([string]$Path) Get-BcObjectIdRange -Path $Path"); // FIXME: Consider passing Objecttype parmaeter
+        public ScriptBlock IdRange { get; set; } = ScriptBlock.Create("param([string]$Path) Get-BcObjectIdRange -Path $Path -ObjectType $ObjectType"); // FIXME: Consider passing Objecttype parmaeter
 
         [Parameter()]
         [ValidateNotNull()]
