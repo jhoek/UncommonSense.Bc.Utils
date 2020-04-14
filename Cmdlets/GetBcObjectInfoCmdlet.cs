@@ -11,7 +11,8 @@ namespace UncommonSense.Bc.Utils
     [OutputType(typeof(ObjectInfo))]
     public class GetBcObjectInfoCmdlet : PSCmdlet
     {
-        public static readonly Regex pattern = new Regex(@"^(?<ObjectType>[A-Za-z]+)\s+(?<ObjectID>\d+)\s+(?<ObjectName>.*?)(\s+extends\s+(?<BaseName>.*))?$");
+        public static readonly Regex normalObjects = new Regex(@"^(?<ObjectType>[A-Za-z]+)\s+(?<ObjectID>\d+)\s+(?<ObjectName>.*?)(\s+extends\s+(?<BaseName>.*))?$", RegexOptions.IgnoreCase);
+        public static readonly Regex pageCustomizations = new Regex(@"^(?<ObjectType>PageCustomization)\s+(?<ObjectName>.*?)\s+customizes\s+(?<BaseName>.*)$", RegexOptions.IgnoreCase);
 
         [Parameter(Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -19,12 +20,10 @@ namespace UncommonSense.Bc.Utils
 
         [Parameter()]
         [ValidateNotNull()]
-        public ObjectType[] ObjectType {get;set;} = Helper.AllObjectTypes().ToArray();
+        public ObjectType[] ObjectType { get; set; } = Helper.AllObjectTypes().ToArray();
 
         [Parameter()]
         public SwitchParameter Recurse { get; set; }
-
-        // FIXME: Page customizations
 
         protected override void ProcessRecord() =>
             WriteObject(
@@ -34,20 +33,25 @@ namespace UncommonSense.Bc.Utils
             );
 
         protected IEnumerable<ObjectInfo> ObjectInfos =>
-            Matches.Select(m => new ObjectInfo(
-                (ObjectType)Enum.Parse(typeof(ObjectType), m.Groups["ObjectType"].Value, true),
-                int.Parse(m.Groups["ObjectID"].Value ?? "0"),
-                m.Groups["ObjectName"].Value,
-                m.Groups["BaseName"].Value
-            ));
+            Matches
+                .ForEach(m => WriteVerbose($"    Match {m}"))
+                .Select(m => new ObjectInfo(
+                    (ObjectType)Enum.Parse(typeof(ObjectType), m.Groups["ObjectType"].Value, true),
+                    int.Parse(m.Groups["ObjectID"].Success ? m.Groups["ObjectID"].Value : "0"),
+                    m.Groups["ObjectName"].Value,
+                    m.Groups["BaseName"].Value
+                ));
 
         protected IEnumerable<Match> Matches =>
             Signatures
-                .Select(s => pattern.Match(s))
+                .ForEach(s => WriteVerbose($"  Signature {s}"))
+                .Select(s => new { input = s, match = normalObjects.Match(s) })
+                .Select(o => o.match.Success ? o.match : pageCustomizations.Match(o.input))
                 .Where(m => m.Success);
 
         protected IEnumerable<string> Signatures =>
             FileNames
+                .ForEach(f => WriteVerbose($"File {f}"))
                 .Select(f => File.ReadLines(f).FirstOrDefault())
                 .Where(s => s != null);
 
