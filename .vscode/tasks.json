@@ -21,6 +21,24 @@
                 "panel": "dedicated"
             },
             "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "test",
+            "command": "pwsh",
+            "type": "shell",
+            "args": [
+                "-Command",
+                "Invoke-Pester"
+            ],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true
+            }
         }
     ]
 }
