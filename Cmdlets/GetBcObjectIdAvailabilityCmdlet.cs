@@ -27,30 +27,32 @@ namespace UncommonSense.Bc.Utils
 
         [Parameter()]
         [ValidateNotNull()]
-        public ScriptBlock IdRange { get; set; } = ScriptBlock.Create("param([string]$Path) Get-BcObjectIdRange -Path $Path -ObjectType $ObjectType"); // FIXME: Consider passing Objecttype parmaeter
+        public ScriptBlock IdRange { get; set; } = ScriptBlock.Create("param([string]$Path, [UncommonSense.Bc.Utils.ObjectType[]]$ObjectType) Get-BcObjectIdRange -Path $Path -ObjectType $ObjectType"); // FIXME: Consider passing Objecttype parmaeter
 
         [Parameter()]
         [ValidateNotNull()]
-        public ScriptBlock Reserved { get; set; } = ScriptBlock.Create("@()");
+        public ScriptBlock Reserved { get; set; } = ScriptBlock.Create("param([string]$Path, [UncommonSense.Bc.Utils.ObjectType[]]$ObjectType) @()");
 
         [Parameter()]
         [ValidateNotNull()]
-        public ScriptBlock InUse { get; set; } = ScriptBlock.Create("param([string]$Path, [switch]$Recurse) Get-BcObjectInfo -Path $Path -Recurse:$Recurse"); // FIXME: Consider passing Objecttype parmaeter
+        public ScriptBlock InUse { get; set; } = ScriptBlock.Create("param([string]$Path, [UncommonSense.Bc.Utils.ObjectType[]]$ObjectType, [switch]$Recurse) Get-BcObjectInfo -Path $Path -Recurse:$Recurse"); // FIXME: Consider passing Objecttype parmaeter
 
         [Parameter()]
-        public ObjectType[] ObjectType { get; set; }
+        [ValidateNotNull()]
+        public ObjectType[] ObjectType { get; set; } = Helper.AllObjectTypes().ToArray();
 
         [Parameter(ParameterSetName = ParameterSet.Summary)]
         public SwitchParameter Summary { get; set; }
 
         protected override void EndProcessing()
         {
-            var idRanges = IdRange.Invoke(Path).Select(o => o.BaseObject).Cast<ObjectIdRange>();
-            var reserved = Reserved.Invoke(Path).Select(o => o.BaseObject).Cast<ObjectIdInfo>();
-            var inUse = InUse.Invoke(Path, Recurse).Select(o => o.BaseObject).Cast<ObjectIdInfo>();
+            var idRanges = IdRange.Invoke(Path, ObjectType).Select(o => o.BaseObject).Cast<ObjectIdRange>();
+            var reserved = Reserved.Invoke(Path, ObjectType).Select(o => o.BaseObject).Cast<ObjectIdInfo>();
+            var inUse = InUse.Invoke(Path, ObjectType, Recurse).Select(o => o.BaseObject).Cast<ObjectIdInfo>();
 
             if (MyInvocation.BoundParameters.ContainsKey(nameof(ObjectType)))
             {
+                WriteVerbose("Applying object type filter");
                 idRanges = idRanges.Where(r => ObjectType.Contains(r.ObjectType));
                 reserved = reserved.Where(r => ObjectType.Contains(r.ObjectType));
                 inUse = inUse.Where(o => ObjectType.Contains(o.ObjectType));
