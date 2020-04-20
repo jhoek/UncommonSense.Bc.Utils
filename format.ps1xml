@@ -14,7 +14,8 @@
 					<CustomEntry>
 						<CustomItem>
 							<ExpressionBinding>
-								<ScriptBlock>[string[]]$Properties = @('ObjectID') + ($_.ConsideredObjectTypes); $_.Items | Format-Table -Property $Properties | Out-String</ScriptBlock>
+								<ScriptBlock>[UncommonSense.Bc.Utils.FormattingHelper]::FormatObjectIdAvailabilitySummary($_, $Host.UI.SupportsVirtualTerminal)</ScriptBlock>
+								<EnumerateCollection/>
 							</ExpressionBinding>
 						</CustomItem>
 					</CustomEntry>

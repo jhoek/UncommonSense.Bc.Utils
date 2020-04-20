@@ -28,7 +28,8 @@
             "type": "shell",
             "args": [
                 "-Command",
-                "Invoke-Pester"
+                "Get-BcObjectIdAvailability -Path ./demo -Summary"
+                //"Invoke-Pester"
             ],
             "group": {
                 "kind": "test",
