@@ -35,7 +35,7 @@ namespace UncommonSense.Bc.Utils
 
         [Parameter()]
         [ValidateNotNull()]
-        public ScriptBlock InUse { get; set; } = ScriptBlock.Create("param([string]$Path, [UncommonSense.Bc.Utils.ObjectType[]]$ObjectType, [switch]$Recurse) Get-BcObjectInfo -Path $Path -Recurse:$Recurse"); // FIXME: Consider passing Objecttype parmaeter
+        public ScriptBlock InUse { get; set; } = ScriptBlock.Create("param([string]$Path, [UncommonSense.Bc.Utils.ObjectType[]]$ObjectType, [switch]$Recurse) Get-BcObjectInfo -Path $Path -ObjectType $ObjectType -Recurse:$Recurse");
 
         [Parameter()]
         [ValidateNotNull()]
