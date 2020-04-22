@@ -1,5 +1,5 @@
 Describe 'Get-BcObjectIdRange' {
-    It 'Returns the right ranges' {
+    It 'Returns the correct ranges' {
         $Result = Get-BcObjectIdRange -Path $PSScriptRoot/../demo
 
         $Result | Should -HaveCount 12
