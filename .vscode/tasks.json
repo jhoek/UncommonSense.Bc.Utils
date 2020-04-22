@@ -28,8 +28,8 @@
             "type": "shell",
             "args": [
                 "-Command",
-                "Get-BcObjectIdAvailability -Path ./demo -Summary"
-                //"Invoke-Pester"
+                // "Get-BcObjectIdAvailability -Path ./demo -Summary"
+                "Invoke-Pester"
             ],
             "group": {
                 "kind": "test",
