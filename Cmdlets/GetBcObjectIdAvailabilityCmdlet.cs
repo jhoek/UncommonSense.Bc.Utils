@@ -27,7 +27,7 @@ namespace UncommonSense.Bc.Utils
 
         [Parameter()]
         [ValidateNotNull()]
-        public ScriptBlock IdRange { get; set; } = ScriptBlock.Create("param([string]$Path, [UncommonSense.Bc.Utils.ObjectType[]]$ObjectType) Get-BcObjectIdRange -Path $Path -ObjectType $ObjectType"); // FIXME: Consider passing Objecttype parmaeter
+        public ScriptBlock IdRange { get; set; } = ScriptBlock.Create("param([string]$Path, [UncommonSense.Bc.Utils.ObjectType[]]$ObjectType) Get-BcObjectIdRange -Path $Path -ObjectType $ObjectType");
 
         [Parameter()]
         [ValidateNotNull()]
