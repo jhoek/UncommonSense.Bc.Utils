@@ -12,5 +12,7 @@ namespace UncommonSense.Bc.Utils
         public ObjectType ObjectType { get; }
         public int ObjectID { get; }
         public Availability Availability { get; }
+
+        public override string ToString() => $"{ObjectType} {ObjectID}: {Availability}";
     }
 }
