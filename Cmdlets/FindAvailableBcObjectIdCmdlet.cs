@@ -26,30 +26,60 @@ namespace UncommonSense.Bc.Utils.Cmdlets
         protected override void EndProcessing()
         {
             FindObjectIds(ObjectType.Table, Table);
+            // FIXME: Other object types
         }
+
+        private const string AvailableBcObjectIdNotFoundErrorID = "UncommonSense.Bc.Utils.AvailableBcObjectIdNotFound";
 
         protected void FindObjectIds(ObjectType objectType, int quantity)
         {
             if (quantity > 0)
-            {
-                var foundGroup = cache
-                    .Where(c => c.ObjectType == objectType)
-                    .Select((c, i) => new { ObjectID = c.ObjectID, GroupID = c.ObjectID - i })
-                    .GroupBy(c => c.GroupID)
-                    .Where(g => g.Count() >= quantity)
-                    .FirstOrDefault();
+                if (!FindSequentialObjectIds(objectType, quantity))
+                    if (!FindIndividualObjectIds(objectType, quantity))
+                        WriteError(
+                            new ErrorRecord(
+                                new AvailableBcObjectIdNotFoundException(objectType, quantity),
+                                AvailableBcObjectIdNotFoundErrorID,
+                                ErrorCategory.ObjectNotFound,
+                                null
+                            )
+                        );
+        }
 
-                if (foundGroup == null)
-                {
-                    WriteWarning($"Could not find {quantity} available, sequential {objectType} IDs.");
-                }
-                else
-                {
-                    foundGroup
-                        .Take(quantity)
-                        .Select(c => new ObjectIdInfo(objectType, c.ObjectID));
-                }
+        protected bool FindSequentialObjectIds(ObjectType objectType, int quantity)
+        {
+            var sequence = cache
+                .Where(c => c.ObjectType == objectType)
+                .Select((c, i) => new { ObjectID = c.ObjectID, SequenceId = c.ObjectID - i })
+                .GroupBy(c => c.SequenceId)
+                .Where(g => g.Count() >= quantity)
+                .FirstOrDefault();
+
+            if (sequence == null)
+            {
+                WriteWarning($"Could not find {quantity} available, sequential {objectType} IDs.");
+                return false;
             }
+
+            sequence
+                .Take(quantity)
+                .Select(c => new ObjectIdInfo(objectType, c.ObjectID))
+                .ForEach(i => WriteObject(i));
+
+            return true;
+        }
+
+        protected bool FindIndividualObjectIds(ObjectType objectType, int quantity)
+        {
+            var ids = cache.Where(c => c.ObjectType == objectType);
+
+            if (ids.Count() >= quantity)
+            {
+                ids.ForEach(i => new ObjectIdInfo(objectType, i.ObjectID));
+                return true;
+            }
+
+            return false;
         }
     }
 }
