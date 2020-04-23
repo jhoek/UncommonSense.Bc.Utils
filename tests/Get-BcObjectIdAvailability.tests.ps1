@@ -37,6 +37,8 @@ Describe 'Get-BcObjectIdAvailability' {
 
     Test-BcObjectIdAvailability -ActualValue $Results -ObjectType Table -ObjectID 50100 -Availability InUse    
     Test-BcObjectIdAvailability -ActualValue $Results -ObjectType Table -ObjectID (50101..50105) -Availability Available
+    Test-BcObjectIdAvailability -ActualValue $Results -ObjectType TableExtension -ObjectID 50100 -Availability InUse    
+    Test-BcObjectIdAvailability -ActualValue $Results -ObjectType TableExtension -ObjectID (50101..50105) -Availability Available
     Test-BcObjectIdAvailability -ActualValue $Results -ObjectType Page -ObjectID 50101 -Availability InUse
     Test-BcObjectIdAvailability -ActualValue $Results -ObjectType Page -ObjectID 50100 -Availability Available
     Test-BcObjectIdAvailability -ActualValue $Results -ObjectType Page -ObjectID (50102..50105) -Availability Available
