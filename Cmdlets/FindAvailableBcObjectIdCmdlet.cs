@@ -33,6 +33,8 @@ namespace UncommonSense.Bc.Utils.Cmdlets
 
         protected void FindObjectIds(ObjectType objectType, int quantity)
         {
+            // FIXME: Consider introducing a switch that will specify a search for sequential IDs.
+
             if (quantity > 0)
                 if (!FindSequentialObjectIds(objectType, quantity))
                     if (!FindIndividualObjectIds(objectType, quantity))
