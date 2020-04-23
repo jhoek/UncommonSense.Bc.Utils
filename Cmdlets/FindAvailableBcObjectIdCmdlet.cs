@@ -75,7 +75,11 @@ namespace UncommonSense.Bc.Utils.Cmdlets
 
             if (ids.Count() >= quantity)
             {
-                ids.ForEach(i => new ObjectIdInfo(objectType, i.ObjectID));
+                ids
+                    .Take(quantity)
+                    .Select(i => new ObjectIdInfo(objectType, i.ObjectID))
+                    .ForEach(i => WriteObject(i));
+
                 return true;
             }
 
