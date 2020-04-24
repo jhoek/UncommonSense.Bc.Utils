@@ -16,6 +16,8 @@ namespace UncommonSense.Bc.Utils
             public const string Summary = nameof(Summary);
         }
 
+        // FIXME: Write-Progress!
+
         [Parameter(Position = 0)]
         [ValidateNotNullOrEmpty()]
         public string Path { get; set; } = ".";

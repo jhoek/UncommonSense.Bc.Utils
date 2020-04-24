@@ -8,7 +8,10 @@ namespace UncommonSense.Bc.Utils.Cmdlets
     [OutputType(typeof(ObjectIdInfo))]
     public class FindAvailableBcObjectIdCmdlet : Cmdlet
     {
-        private List<ObjectIdAvailability> cache;
+        private List<ObjectIdAvailability> availableIdCache;
+
+        // FIXME: Consider making ObjectIdAvailableity a scriptblock - would require addiotnal parameters to pass to scriptblock
+        // FIXME: as $objectType, pass it only the requested types, e.g. -Table 4 => -ObjectType Table
 
         [Parameter(Mandatory = true, ValueFromPipeline = true)]
         public ObjectIdAvailability[] ObjectIdAvailability { get; set; }
@@ -17,63 +20,128 @@ namespace UncommonSense.Bc.Utils.Cmdlets
         [ValidateRange(1, int.MaxValue)]
         public int Table { get; set; }
 
+        [Parameter()]
+        [ValidateRange(1, int.MaxValue)]
+        public int TableExtension { get; set; }
+
+        [Parameter()]
+        [ValidateRange(1, int.MaxValue)]
+        public int Page { get; set; }
+
+        [Parameter()]
+        [ValidateRange(1, int.MaxValue)]
+        public int PageExtension { get; set; }
+
+        [Parameter()]
+        [ValidateRange(1, int.MaxValue)]
+        public int PageCustomization { get; set; }
+
+        [Parameter()]
+        [ValidateRange(1, int.MaxValue)]
+        public int Report { get; set; }
+
+        [Parameter()]
+        [ValidateRange(1, int.MaxValue)]
+        public int Codeunit { get; set; }
+
+        [Parameter()]
+        [ValidateRange(1, int.MaxValue)]
+        public int XmlPort { get; set; }
+
+        [Parameter()]
+        [ValidateRange(1, int.MaxValue)]
+        public int Query { get; set; }
+
+        [Parameter()]
+        [ValidateRange(1, int.MaxValue)]
+        public int Profile { get; set; }
+
+        [Parameter()]
+        [ValidateRange(1, int.MaxValue)]
+        public int Enum { get; set; }
+
+        [Parameter()]
+        [ValidateRange(1, int.MaxValue)]
+        public int EnumExtension { get; set; }
+
+        [Parameter()]
+        public SwitchParameter Contiguous { get; set; }
+
         protected override void BeginProcessing() =>
-            cache = new List<ObjectIdAvailability>();
+            availableIdCache = new List<ObjectIdAvailability>();
 
         protected override void ProcessRecord() =>
-            cache.AddRange(ObjectIdAvailability.Where(a => a.Availability == Availability.Available));
+            availableIdCache.AddRange(
+                ObjectIdAvailability
+                    .Where(a => a.Availability == Availability.Available)
+            );
 
         protected override void EndProcessing()
         {
             FindObjectIds(ObjectType.Table, Table);
-            // FIXME: Other object types
+            FindObjectIds(ObjectType.TableExtension, TableExtension);
+            FindObjectIds(ObjectType.Page, Page);
+            FindObjectIds(ObjectType.PageExtension, PageExtension);
+            FindObjectIds(ObjectType.PageCustomization, PageCustomization); // FIXME: Nodig?
+            FindObjectIds(ObjectType.Report, Report);
+            FindObjectIds(ObjectType.Codeunit, Codeunit);
+            FindObjectIds(ObjectType.XmlPort, XmlPort);
+            FindObjectIds(ObjectType.Query, Query);
+            FindObjectIds(ObjectType.Profile, Profile);
+            FindObjectIds(ObjectType.Enum, Enum);
+            FindObjectIds(ObjectType.EnumExtension, EnumExtension);
         }
 
         private const string AvailableBcObjectIdNotFoundErrorID = "UncommonSense.Bc.Utils.AvailableBcObjectIdNotFound";
 
         protected void FindObjectIds(ObjectType objectType, int quantity)
         {
-            // FIXME: Consider introducing a switch that will specify a search for sequential IDs.
+            if (quantity == 0)
+                return;
 
-            if (quantity > 0)
-                if (!FindSequentialObjectIds(objectType, quantity))
-                    if (!FindIndividualObjectIds(objectType, quantity))
-                        WriteError(
-                            new ErrorRecord(
-                                new AvailableBcObjectIdNotFoundException(objectType, quantity),
-                                AvailableBcObjectIdNotFoundErrorID,
-                                ErrorCategory.ObjectNotFound,
-                                null
-                            )
-                        );
+            var success =
+                Contiguous ?
+                    FindSequentialObjectIds(objectType, quantity) :
+                    FindIndividualObjectIds(objectType, quantity);
+
+            if (!success)
+            {
+                WriteError(
+                    new ErrorRecord(
+                        new AvailableBcObjectIdNotFoundException(objectType, quantity, Contiguous),
+                        AvailableBcObjectIdNotFoundErrorID,
+                        ErrorCategory.ObjectNotFound,
+                        null
+                    )
+                );
+            }
         }
 
         protected bool FindSequentialObjectIds(ObjectType objectType, int quantity)
         {
-            var sequence = cache
+            var sequence = availableIdCache
                 .Where(c => c.ObjectType == objectType)
                 .Select((c, i) => new { ObjectID = c.ObjectID, SequenceId = c.ObjectID - i })
                 .GroupBy(c => c.SequenceId)
                 .Where(g => g.Count() >= quantity)
                 .FirstOrDefault();
 
-            if (sequence == null)
+            if (sequence != null)
             {
-                WriteWarning($"Could not find {quantity} available, sequential {objectType} IDs.");
-                return false;
+                sequence
+                    .Take(quantity)
+                    .Select(c => new ObjectIdInfo(objectType, c.ObjectID))
+                    .ForEach(i => WriteObject(i));
+
+                return true;
             }
-
-            sequence
-                .Take(quantity)
-                .Select(c => new ObjectIdInfo(objectType, c.ObjectID))
-                .ForEach(i => WriteObject(i));
-
-            return true;
+            else
+                return false;
         }
 
         protected bool FindIndividualObjectIds(ObjectType objectType, int quantity)
         {
-            var ids = cache.Where(c => c.ObjectType == objectType);
+            var ids = availableIdCache.Where(c => c.ObjectType == objectType);
 
             if (ids.Count() >= quantity)
             {
