@@ -58,12 +58,15 @@ namespace UncommonSense.Bc.Utils
             WriteProgress(progressRecord);
             var reserved = Reserved.Invoke(Path, ObjectType).Select(o => o.BaseObject).Cast<ObjectIdInfo>();
 
-            //WriteProgress(progressRecord.SetStatusDescription("Finding IDs in use"));
+            progressRecord.StatusDescription = "Finding IDs in use";
+            WriteProgress(progressRecord);
             var inUse = InUse.Invoke(Path, ObjectType, Recurse).Select(o => o.BaseObject).Cast<ObjectIdInfo>();
 
             if (MyInvocation.BoundParameters.ContainsKey(nameof(ObjectType)))
             {
-                //  WriteProgress(progressRecord.SetStatusDescription("Applying filters"));
+                progressRecord.StatusDescription = "Applying filters";
+                WriteProgress(progressRecord);
+
                 idRanges = idRanges.Where(r => ObjectType.Contains(r.ObjectType));
                 reserved = reserved.Where(r => ObjectType.Contains(r.ObjectType));
                 inUse = inUse.Where(o => ObjectType.Contains(o.ObjectType));
