@@ -25,8 +25,6 @@ namespace UncommonSense.Bc.Utils
         [Parameter()]
         public SwitchParameter Recurse { get; set; }
 
-        // FIXME: Consider making parameters their native type, and provide argument transofmrations for scriptblocks
-
         [Parameter()]
         [ValidateNotNull()]
         public ScriptBlock IdRange { get; set; } = ScriptBlock.Create("param([string]$Path, [UncommonSense.Bc.Utils.ObjectType[]]$ObjectType) Get-BcObjectIdRange -Path $Path -ObjectType $ObjectType");
@@ -48,13 +46,24 @@ namespace UncommonSense.Bc.Utils
 
         protected override void EndProcessing()
         {
+            ProgressRecord progressRecord = new ProgressRecord(0, "Calculating object ID availability", "Initializing");
+
+            WriteProgress(progressRecord);
+
+            progressRecord.StatusDescription = "Finding ID ranges";
+            WriteProgress(progressRecord);
             var idRanges = IdRange.Invoke(Path, ObjectType).Select(o => o.BaseObject).Cast<ObjectIdRange>();
+
+            progressRecord.StatusDescription = "Finding reserved IDs";
+            WriteProgress(progressRecord);
             var reserved = Reserved.Invoke(Path, ObjectType).Select(o => o.BaseObject).Cast<ObjectIdInfo>();
+
+            //WriteProgress(progressRecord.SetStatusDescription("Finding IDs in use"));
             var inUse = InUse.Invoke(Path, ObjectType, Recurse).Select(o => o.BaseObject).Cast<ObjectIdInfo>();
 
             if (MyInvocation.BoundParameters.ContainsKey(nameof(ObjectType)))
             {
-                WriteVerbose("Applying object type filter");
+                //  WriteProgress(progressRecord.SetStatusDescription("Applying filters"));
                 idRanges = idRanges.Where(r => ObjectType.Contains(r.ObjectType));
                 reserved = reserved.Where(r => ObjectType.Contains(r.ObjectType));
                 inUse = inUse.Where(o => ObjectType.Contains(o.ObjectType));
