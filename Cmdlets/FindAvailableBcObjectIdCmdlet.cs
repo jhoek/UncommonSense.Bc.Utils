@@ -8,13 +8,16 @@ namespace UncommonSense.Bc.Utils.Cmdlets
     [OutputType(typeof(ObjectIdInfo))]
     public class FindAvailableBcObjectIdCmdlet : Cmdlet
     {
-        private List<ObjectIdAvailability> availableIdCache;
+        [Parameter(Position = 0)]
+        [ValidateNotNullOrEmpty()]
+        public string Path { get; set; } = ".";
 
-        // FIXME: Consider making ObjectIdAvailableity a scriptblock - would require addiotnal parameters to pass to scriptblock
-        // FIXME: as $objectType, pass it only the requested types, e.g. -Table 4 => -ObjectType Table
+        [Parameter()]
+        public SwitchParameter Recurse { get; set; }
 
-        [Parameter(Mandatory = true, ValueFromPipeline = true)]
-        public ObjectIdAvailability[] ObjectIdAvailability { get; set; }
+        [Parameter()]
+        [ValidateNotNull()]
+        public ScriptBlock ObjectIdAvailability { get; set; } = ScriptBlock.Create("param([string]$Path, [Switch]$Recurse, [UncommonSense.Bc.Utils.ObjectType[]]$ObjectType) Get-BcObjectIdAvailability -Path $Path -Recurse:$Recurse -ObjectType $ObjectType");
 
         [Parameter()]
         [ValidateRange(1, int.MaxValue)]
@@ -63,15 +66,6 @@ namespace UncommonSense.Bc.Utils.Cmdlets
         [Parameter()]
         public SwitchParameter Contiguous { get; set; }
 
-        protected override void BeginProcessing() =>
-            availableIdCache = new List<ObjectIdAvailability>();
-
-        protected override void ProcessRecord() =>
-            availableIdCache.AddRange(
-                ObjectIdAvailability
-                    .Where(a => a.Availability == Availability.Available)
-            );
-
         protected override void EndProcessing()
         {
             FindObjectIds(ObjectType.Table, Table);
@@ -88,6 +82,31 @@ namespace UncommonSense.Bc.Utils.Cmdlets
         }
 
         private const string AvailableBcObjectIdNotFoundErrorID = "UncommonSense.Bc.Utils.AvailableBcObjectIdNotFound";
+
+        protected IEnumerable<ObjectType> RequestedObjectTypes
+        {
+            get
+            {
+                if (Table > 0) yield return ObjectType.Table;
+                if (TableExtension > 0) yield return ObjectType.TableExtension;
+                if (Page > 0) yield return ObjectType.Page;
+                if (PageExtension > 0) yield return ObjectType.PageExtension;
+                if (Report > 0) yield return ObjectType.Report;
+                if (Codeunit > 0) yield return ObjectType.Codeunit;
+                if (XmlPort > 0) yield return ObjectType.XmlPort;
+                if (Query > 0) yield return ObjectType.Query;
+                if (Profile > 0) yield return ObjectType.Profile;
+                if (Enum > 0) yield return ObjectType.Enum;
+                if (EnumExtension > 0) yield return ObjectType.EnumExtension;
+            }
+        }
+
+        protected IEnumerable<ObjectIdAvailability> AvailableObjectIds =>
+            ObjectIdAvailability
+                .Invoke(Path, Recurse, RequestedObjectTypes)
+                .Select(o => o.BaseObject)
+                .Cast<ObjectIdAvailability>()
+                .Where(a => a.Availability == Availability.Available);
 
         protected void FindObjectIds(ObjectType objectType, int quantity)
         {
@@ -114,7 +133,7 @@ namespace UncommonSense.Bc.Utils.Cmdlets
 
         protected bool FindSequentialObjectIds(ObjectType objectType, int quantity)
         {
-            var sequence = availableIdCache
+            var sequence = AvailableObjectIds
                 .Where(c => c.ObjectType == objectType)
                 .Select((c, i) => new { ObjectID = c.ObjectID, SequenceId = c.ObjectID - i })
                 .GroupBy(c => c.SequenceId)
@@ -136,7 +155,7 @@ namespace UncommonSense.Bc.Utils.Cmdlets
 
         protected bool FindIndividualObjectIds(ObjectType objectType, int quantity)
         {
-            var ids = availableIdCache.Where(c => c.ObjectType == objectType);
+            var ids = AvailableObjectIds.Where(c => c.ObjectType == objectType);
 
             if (ids.Count() >= quantity)
             {
