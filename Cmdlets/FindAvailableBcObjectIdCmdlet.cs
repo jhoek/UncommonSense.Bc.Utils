@@ -34,10 +34,6 @@ namespace UncommonSense.Bc.Utils.Cmdlets
 
         [Parameter()]
         [ValidateRange(1, int.MaxValue)]
-        public int PageCustomization { get; set; }
-
-        [Parameter()]
-        [ValidateRange(1, int.MaxValue)]
         public int Report { get; set; }
 
         [Parameter()]
@@ -82,7 +78,6 @@ namespace UncommonSense.Bc.Utils.Cmdlets
             FindObjectIds(ObjectType.TableExtension, TableExtension);
             FindObjectIds(ObjectType.Page, Page);
             FindObjectIds(ObjectType.PageExtension, PageExtension);
-            FindObjectIds(ObjectType.PageCustomization, PageCustomization); // FIXME: Nodig?
             FindObjectIds(ObjectType.Report, Report);
             FindObjectIds(ObjectType.Codeunit, Codeunit);
             FindObjectIds(ObjectType.XmlPort, XmlPort);
