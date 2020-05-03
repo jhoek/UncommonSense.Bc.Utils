@@ -73,19 +73,27 @@ namespace UncommonSense.Bc.Utils
 
         protected void WriteDetails(IEnumerable<ObjectIdRange> idRanges, IEnumerable<ObjectIdInfo> reserved, IEnumerable<ObjectIdInfo> inUse)
         {
+            var progressRecord = new ProgressRecord(1, "Calculating BC object ID availability", "Initializing");
+            WriteProgress(progressRecord);
+
             WriteObject(
                 idRanges.SelectMany(r =>
-                    r.IDs.Select(i => new ObjectIdAvailability(r.ObjectType, i, CalculateAvailability(r.ObjectType, i, reserved, inUse)))
+                    r.IDs.Select(i => new ObjectIdAvailability(r.ObjectType, i, CalculateAvailability(r.ObjectType, i, reserved, inUse, progressRecord)))
                 ),
                 true
             );
         }
 
-        protected Availability CalculateAvailability(ObjectType objectType, int objectID, IEnumerable<ObjectIdInfo> reserved, IEnumerable<ObjectIdInfo> inUse) =>
-            inUse.Any(o => o.ObjectType == objectType && o.ObjectID == objectID) ?
+        protected Availability CalculateAvailability(ObjectType objectType, int objectID, IEnumerable<ObjectIdInfo> reserved, IEnumerable<ObjectIdInfo> inUse, ProgressRecord progressRecord)
+        {
+            progressRecord.StatusDescription = $"{objectType} {objectID}";
+            WriteProgress(progressRecord);
+
+            return inUse.Any(o => o.ObjectType == objectType && o.ObjectID == objectID) ?
                 Availability.InUse :
                 reserved.Any(o => o.ObjectType == objectType && o.ObjectID == objectID) ?
                     Availability.Reserved :
                     Availability.Available;
+        }
     }
 }
