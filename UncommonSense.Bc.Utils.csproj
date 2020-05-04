@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <OutputPath>output/$(AssemblyName)/</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="PowershellStandard.Library" Version="5.1.1" />
+    <PackageReference Include="System.Text.Json" Version="4.7.1" />
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="pwsh -Command 'Copy-Item $(ProjectDir)format.ps1xml $(TargetDir)$(TargetName).format.ps1xml'" />
+    <Exec Command="pwsh -Command 'New-BinaryModuleManifest -Path $(TargetDir)$(TargetName).psd1 -ModulePath $(ProjectDir) -Guid 91c82f56-81df-4f66-9dda-60f75d1dec20'" />
+  </Target>
+</Project>
