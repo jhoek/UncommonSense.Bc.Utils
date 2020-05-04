@@ -68,17 +68,24 @@ namespace UncommonSense.Bc.Utils.Cmdlets
 
         protected override void EndProcessing()
         {
-            FindObjectIds(ObjectType.Table, Table);
-            FindObjectIds(ObjectType.TableExtension, TableExtension);
-            FindObjectIds(ObjectType.Page, Page);
-            FindObjectIds(ObjectType.PageExtension, PageExtension);
-            FindObjectIds(ObjectType.Report, Report);
-            FindObjectIds(ObjectType.Codeunit, Codeunit);
-            FindObjectIds(ObjectType.XmlPort, XmlPort);
-            FindObjectIds(ObjectType.Query, Query);
-            FindObjectIds(ObjectType.Profile, Profile);
-            FindObjectIds(ObjectType.Enum, Enum);
-            FindObjectIds(ObjectType.EnumExtension, EnumExtension);
+            var availableObjectIds =
+                ObjectIdAvailability
+                    .Invoke(Path, Recurse, RequestedObjectTypes)
+                    .Select(o => o.BaseObject)
+                    .Cast<ObjectIdAvailability>()
+                    .Where(a => a.Availability == Availability.Available);
+
+            FindObjectIds(availableObjectIds, ObjectType.Table, Table);
+            FindObjectIds(availableObjectIds, ObjectType.TableExtension, TableExtension);
+            FindObjectIds(availableObjectIds, ObjectType.Page, Page);
+            FindObjectIds(availableObjectIds, ObjectType.PageExtension, PageExtension);
+            FindObjectIds(availableObjectIds, ObjectType.Report, Report);
+            FindObjectIds(availableObjectIds, ObjectType.Codeunit, Codeunit);
+            FindObjectIds(availableObjectIds, ObjectType.XmlPort, XmlPort);
+            FindObjectIds(availableObjectIds, ObjectType.Query, Query);
+            FindObjectIds(availableObjectIds, ObjectType.Profile, Profile);
+            FindObjectIds(availableObjectIds, ObjectType.Enum, Enum);
+            FindObjectIds(availableObjectIds, ObjectType.EnumExtension, EnumExtension);
         }
 
         private const string AvailableBcObjectIdNotFoundErrorID = "UncommonSense.Bc.Utils.AvailableBcObjectIdNotFound";
@@ -101,22 +108,15 @@ namespace UncommonSense.Bc.Utils.Cmdlets
             }
         }
 
-        protected IEnumerable<ObjectIdAvailability> AvailableObjectIds =>
-            ObjectIdAvailability
-                .Invoke(Path, Recurse, RequestedObjectTypes)
-                .Select(o => o.BaseObject)
-                .Cast<ObjectIdAvailability>()
-                .Where(a => a.Availability == Availability.Available);
-
-        protected void FindObjectIds(ObjectType objectType, int quantity)
+        protected void FindObjectIds(IEnumerable<ObjectIdAvailability> availableObjectIds, ObjectType objectType, int quantity)
         {
             if (quantity == 0)
                 return;
 
             var success =
                 Contiguous ?
-                    FindSequentialObjectIds(objectType, quantity) :
-                    FindIndividualObjectIds(objectType, quantity);
+                    FindSequentialObjectIds(availableObjectIds, objectType, quantity) :
+                    FindIndividualObjectIds(availableObjectIds, objectType, quantity);
 
             if (!success)
             {
@@ -131,9 +131,9 @@ namespace UncommonSense.Bc.Utils.Cmdlets
             }
         }
 
-        protected bool FindSequentialObjectIds(ObjectType objectType, int quantity)
+        protected bool FindSequentialObjectIds(IEnumerable<ObjectIdAvailability> availableObjectIds, ObjectType objectType, int quantity)
         {
-            var sequence = AvailableObjectIds
+            var sequence = availableObjectIds
                 .Where(c => c.ObjectType == objectType)
                 .Select((c, i) => new { ObjectID = c.ObjectID, SequenceId = c.ObjectID - i })
                 .GroupBy(c => c.SequenceId)
@@ -153,9 +153,9 @@ namespace UncommonSense.Bc.Utils.Cmdlets
                 return false;
         }
 
-        protected bool FindIndividualObjectIds(ObjectType objectType, int quantity)
+        protected bool FindIndividualObjectIds(IEnumerable<ObjectIdAvailability> availableObjectIds, ObjectType objectType, int quantity)
         {
-            var ids = AvailableObjectIds.Where(c => c.ObjectType == objectType);
+            var ids = availableObjectIds.Where(c => c.ObjectType == objectType);
 
             if (ids.Count() >= quantity)
             {
