@@ -25,6 +25,10 @@ namespace UncommonSense.Bc.Utils
 
         [Parameter()]
         [ValidateNotNull()]
+        public ObjectType[] ObjectType { get; set; } = Helper.AllObjectTypes().ToArray();
+
+        [Parameter()]
+        [ValidateNotNull()]
         public ScriptBlock IdRange { get; set; } = ScriptBlock.Create("param([string]$Path, [UncommonSense.Bc.Utils.ObjectType[]]$ObjectType) Get-BcObjectIdRange -Path $Path -ObjectType $ObjectType");
 
         [Parameter()]
@@ -34,10 +38,6 @@ namespace UncommonSense.Bc.Utils
         [Parameter()]
         [ValidateNotNull()]
         public ScriptBlock InUse { get; set; } = ScriptBlock.Create("param([string]$Path, [UncommonSense.Bc.Utils.ObjectType[]]$ObjectType, [switch]$Recurse) Get-BcObjectInfo -Path $Path -ObjectType $ObjectType -Recurse:$Recurse");
-
-        [Parameter()]
-        [ValidateNotNull()]
-        public ObjectType[] ObjectType { get; set; } = Helper.AllObjectTypes().ToArray();
 
         [Parameter(ParameterSetName = ParameterSet.Summary)]
         public SwitchParameter Summary { get; set; }
