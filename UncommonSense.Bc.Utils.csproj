@@ -14,5 +14,6 @@
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="pwsh -Command &quot;Copy-Item $(ProjectDir)format.ps1xml $(TargetDir)$(TargetName).format.ps1xml&quot;" />
     <Exec Command="pwsh -Command &quot;New-BinaryModuleManifest -Path $(TargetDir)$(TargetName).psd1 -ModulePath $(ProjectDir) -Guid 91c82f56-81df-4f66-9dda-60f75d1dec20 -Description &apos;Utils for Microsoft Dynamics 365 Business Central developers&apos;&quot;" />
+    <Exec Command="pwsh -Command &quot;Update-ModuleManifest -Path $(TargetDir)$(TargetName).psd1 -LicenseUri &apos;https://github.com/jhoek/UncommonSense.Bc.Utils/blob/master/LICENSE&apos; -ProjectUri &apos;https://github.com/jhoek/UncommonSense.Bc.Utils&apos;&quot; -Tags &apos;Microsoft,Dynamics365,BusinessCentral,developer,utils,ObjectID&apos;" />
   </Target>
 </Project>
