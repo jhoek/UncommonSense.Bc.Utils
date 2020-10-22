@@ -6,6 +6,7 @@ namespace UncommonSense.Bc.Utils.Cmdlets
 {
     [Cmdlet(VerbsCommon.Find, "AvailableBcObjectId")]
     [OutputType(typeof(ObjectIdInfo))]
+    [Alias("Find-BcObjectId")]
     public class FindAvailableBcObjectIdCmdlet : Cmdlet
     {
         [Parameter(Position = 0)]
