@@ -1,0 +1,1 @@
+Publish-Module -Path ./output/UncommonSense.Bc.Utils -NuGetApiKey $env:NuGetApiKey
