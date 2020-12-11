@@ -20,7 +20,7 @@ To install the module for all users of your machine, run the following from an e
 | Get-BcObjectInfo           | Retrieves object information (Type, ID, Name and, where applicable, BaseName) from AL objects that reside in disk files. |
 | New-BcObjectIdInfo         | Creates output objects that each contain a combination of an object type and object ID.                                  |
 | Get-BcObjectIdRange        | Retrieves the object ID ranges from an app's `app.json` file, given the app's folder path.                               |
-| New-BcObjectIdRange        | Manually sefines available ID ranges.                                                                                    |
+| New-BcObjectIdRange        | Manually defines available ID ranges.                                                                                    |
 | Get-BcObjectIdAvailability | Calculates the availability state (Available, Reserved or InUse) of the objects in a folder or folder structure.         |
 | Find-AvailableBcObjectId   | Finds available object IDs for the given object type(s).                                                                 |
 
